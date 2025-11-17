@@ -1,0 +1,39 @@
+services:
+  mysqldb:
+    container_name: mysql-db
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hospital
+      # MYSQL_USER: klu
+      # MYSQL_PASSWORD: klu
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql   # volume added here
+
+  backend:
+   
+    container_name: springboot
+    build:
+      context: ./hospital-backend-main
+      dockerfile: ./Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysqldb
+    restart: on-failure
+
+  frontend:
+   
+    container_name: react
+    build:
+      context: ./hospital-frontend-main
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
